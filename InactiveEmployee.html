@@ -1,0 +1,178 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inactive Employees</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+            table th, table td {
+                padding: 12px;
+                border: 1px solid #ddd;
+                text-align: left;
+            }
+
+            table th {
+                background-color: #f44336;
+                color: white;
+            }
+
+            table tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+
+        .no-data {
+            text-align: center;
+            color: red;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .loader {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+            .loader img {
+                width: 50px;
+                height: 50px;
+            }
+
+        .back-button {
+            width: 100%;
+            padding: 12px 25px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 100px;
+            text-decoration: none; /* Remove underline from the link */
+        }
+
+            .back-button:hover {
+                background-color: #45a049;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Inactive Employees</h2>
+
+        <!-- Loading spinner -->
+        <div class="loader" id="loader" style="display: none;">
+            <img src="https://i.imgur.com/llF5iyg.gif" alt="Loading...">
+        </div>
+
+        <!-- Table for displaying inactive employees -->
+        <table id="employeeTable">
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Date of Birth</th>
+                    <th>Date of Joining</th>
+                    <th>CTC</th>
+                    <th>Designation</th>
+                    <th>Office Email</th>
+                    <th>Mobile Number</th>
+                    <th>Last Working Day</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be dynamically inserted here -->
+            </tbody>
+        </table>
+
+        <!-- Message if no inactive employees are found -->
+        <div class="no-data" id="noDataMessage" style="display: none;">
+            No inactive employees found.
+
+        </div>
+    </div>
+    <a href="MainPage.html"<button class="back-button" onclick="goBack()">Go Back</button></a>
+    <script>// Function to fetch inactive employees and display them in a table
+        function fetchInactiveEmployees() {
+            document.getElementById("loader").style.display = "block"; // Show loading spinner
+            document.getElementById("employeeTable").style.display = "none"; // Hide the table during fetch
+            document.getElementById("noDataMessage").style.display = "none"; // Hide no data message
+
+            // Fetch inactive employees from the backend API (replace with actual URL)
+            fetch('http://localhost:50978/api/values/InActiveEmployees')  // Replace with your backend API URL
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("loader").style.display = "none"; // Hide loading spinner
+                    document.getElementById("employeeTable").style.display = "table"; // Show the table
+
+                    const tableBody = document.getElementById("employeeTable").getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = ""; // Clear any existing data
+
+                    if (data && data.length > 0) {
+                        // Loop through the employee data and insert rows into the table
+                        data.forEach(employee => {
+                            const row = document.createElement("tr");
+
+                            row.innerHTML = `
+                                    <td>${employee.Eid}</td>
+                                    <td>${employee.first_name}</td>
+                                    <td>${employee.last_name}</td>
+                                    <td>${employee.dob}</td>
+                                    <td>${employee.doj}</td>
+                                    <td>${employee.ctc}</td>
+                                    <td>${employee.designation}</td>
+                                    <td>${employee.office_email}</td>
+                                    <td>${employee.mob_num}</td>
+                                    <td>${employee.last_working_day}</td>
+                                `;
+
+                            tableBody.appendChild(row);
+                        });
+                    } else {
+                        // If no inactive employees, display a message
+                        document.getElementById("noDataMessage").style.display = "block";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById("loader").style.display = "none";
+                    document.getElementById("noDataMessage").style.display = "block";
+                    document.getElementById("noDataMessage").textContent = "Error fetching employee data.";
+                });
+            function goBack() {
+                window.history.back(); // This will take the user back to the previous page
+            }
+        }
+
+        // Call the function to fetch inactive employees when the page loads
+        window.onload = fetchInactiveEmployees;</script>
+
+</body>
+</html>
